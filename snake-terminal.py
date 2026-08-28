@@ -1,8 +1,8 @@
 # IEatSpaceRocks, 28/08/2026
 
 # Libraries
+import sys
 import random
-import os, subprocess
 
 # Generate board
 board = [["g"] * 17 for _ in range(15)]
@@ -29,7 +29,7 @@ class ANSI:
 
 # Clear the terminal
 def clearTerm():
-    subprocess.run('cls' if os.name == 'nt' else 'clear', shell=True)
+    sys.stdout.write("\033[H\033[J")        # Move cursor to top left and clear everything after it
 
 # Print a 4 space long block in a given colour
 def printBlock(colour):
@@ -71,9 +71,10 @@ while running:
     board[snakeY][snakeX] = "g"
     
     # Input for movement direction
-    move = input()
+    move = ""
     while move not in ("w", "a", "s", "d"):
         move = input()
+        sys.stdout.write("\033[1A\033[2K")        # Move to previous line and erase it (Clears the last input)
     
     # Logic for movement
     if move == "w":
