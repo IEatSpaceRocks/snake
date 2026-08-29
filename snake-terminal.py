@@ -1,4 +1,4 @@
-# IEatSpaceRocks, 28/08/2026
+# IEatSpaceRocks, 29/08/2026
 
 # Libraries
 import sys
@@ -9,6 +9,9 @@ board = [["g"] * 17 for _ in range(15)]
 
 # Variables
 snakeY, snakeX = 7, 8
+appleY, appleX = 7, 8
+snake = []
+score = 0
 running = True
 
 
@@ -23,6 +26,7 @@ class ANSI:
     GREEN1 = getCol((167, 217, 72))
     GREEN2 = getCol((142, 204, 57))
     BLUE = getCol((66, 111, 227))
+    RED = getCol((231, 71, 29))
 
 
 # Functions
@@ -34,6 +38,28 @@ def clearTerm():
 # Print a 4 space long block in a given colour
 def printBlock(colour):
     print(getattr(ANSI, colour) + "    " + ANSI.RESET, end="")
+
+def checkApple(aX, aY, sX, sY, score):
+    if aX == sX and aY == sY:
+        while aX == sX:
+            aX = random.randint(0, 16)
+        while aY == sY:
+            aY = random.randint(0, 14)
+        board[aY][aX] = "A"
+        score += 1
+    return aX, aY, score
+
+def updateSnake(sX, sY, score):
+    snake.append([sY, sX])
+    board[sY][sX] = "S"
+    while len(snake) != score:
+        if sY == snake[0][0] and sX == snake[0][1]:
+            pass
+        else:
+            board[snake[0][0]][snake[0][1]] = "g"
+        snake.pop(0)
+
+
 
 # Print the board itself
 def printBoard():
@@ -48,6 +74,8 @@ def printBoard():
                         printBlock("GREEN2")
                 elif board[y][x] == "S":            # If a snake tile:
                     printBlock("BLUE")
+                elif board[y][x] == "A":
+                    printBlock("RED")
                 count += 1                          # Add one to count, to change the grass colour
             count += 1                              # Add one to count after each row, to make it print the same colour blocks again (So we get a 2 high patch)
             print()                                 # New line
@@ -60,15 +88,13 @@ def printBoard():
 while running:
     
     clearTerm()
-    
-    # Add snake to board
-    board[snakeY][snakeX] = "S"
-    
+
+    appleX, appleY, score = checkApple(appleX, appleY, snakeX, snakeY, score)
+    updateSnake(snakeX, snakeY, score)
+        
     # Print board (Every second grass patch will be a different shade)
     printBoard()
-    
-    # Remove previous snake
-    board[snakeY][snakeX] = "g"
+    print(score, snake)
     
     # Input for movement direction
     move = ""
@@ -90,4 +116,8 @@ while running:
     if snakeY < 0 or snakeX < 0 or snakeY > 14 or snakeX > 16:
         print("You died")
         running = False
-        
+    for part in snake:
+        if snake.count(part) == 2:
+            print("Dead")
+            running = False
+            break
