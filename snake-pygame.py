@@ -8,12 +8,17 @@ colours = {
     "GREEN1" : (170, 215, 81),
     "GREEN2" : (162, 209, 73),
     "GREEN3" : (87, 138, 52),
-    "GREEN4" : (74, 117, 44)
+    "GREEN4" : (74, 117, 44),
+    "RED" : (231, 71, 29),
+    "BLUE" : (66, 111, 227)
 }
 
 # Variables
 running = True
-
+apple = [1, 1]
+snake = [[9, 8]]
+count = 0
+facing = "down"
 
 # Initialize Pygame and set up the screen
 pygame.init()
@@ -32,7 +37,11 @@ for col in range(1, 18):
     for row in range(1, 16):
         colour = "GREEN2" if (row + col) % 2 == 0 else "GREEN1"
         pygame.draw.rect(board, colours.get(colour), (col * 40, 120 + row * 40, 40, 40))
-
+        
+def draw():
+    pygame.draw.circle(screen, colours.get("RED"), (40 + apple[0] * 40 - 20, 160 + apple[1] * 40 - 20), 19)
+    for part in snake:
+        pygame.draw.rect(screen, colours.get("BLUE"), (part[0] * 40, 120 + part[1] * 40, 40, 40))
 
 # MAIN LOOP
 
@@ -42,20 +51,42 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-            running = False
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                running = False
+            elif event.key == pygame.K_a or event.key == pygame.K_LEFT:
+                facing = "left"
+            elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
+                facing = "right"
+            elif event.key == pygame.K_w or event.key == pygame.K_UP:
+                facing = "up"
+            elif event.key == pygame.K_s or event.key == pygame.K_DOWN:
+                facing = "down"
+            
+
+            
+    count += 1
+    
+    if count % 12 == 0:
+        if facing == "left":
+            snake[0][0] -= 1
+        elif facing == "right":
+            snake[0][0] += 1
+        elif facing == "up":
+            snake[0][1] -= 1
+        elif facing == "down":
+            snake[0][1] += 1
 
     # Add board to the screen
     screen.blit(board, (0, 0))
     
-    # Update screen
-    pygame.display.flip()
+    draw()
     
+    # Update screen
+    pygame.display.flip()  
+        
     # 60 fps
     pygame.time.Clock().tick(60)
 
 # If game loop exited, exit pygame
 pygame.quit()
-
-
-
