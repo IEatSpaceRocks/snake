@@ -18,7 +18,7 @@ running = True
 apple = [1, 1]
 snake = [[9, 8]]
 count = 0
-facing = "down"
+facing = ["up"]
 
 # Initialize Pygame and set up the screen
 pygame.init()
@@ -43,6 +43,17 @@ def draw():
     for part in snake:
         pygame.draw.rect(screen, colours.get("BLUE"), (part[0] * 40, 120 + part[1] * 40, 40, 40))
 
+def move(direction):
+    if direction == "left":
+        snake[0][0] -= 1
+    elif direction == "right":
+        snake[0][0] += 1
+    elif direction == "up":
+        snake[0][1] -= 1
+    elif direction == "down":
+        snake[0][1] += 1
+
+
 # MAIN LOOP
 
 while running:
@@ -55,28 +66,30 @@ while running:
             if event.key == pygame.K_ESCAPE:
                 running = False
             elif event.key == pygame.K_a or event.key == pygame.K_LEFT:
-                facing = "left"
+                if facing[0] != "left" and len(facing) == 1:
+                    facing.append("left")
             elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
-                facing = "right"
+                if facing[0] != "right" and len(facing) == 1:
+                    facing.append("right")
             elif event.key == pygame.K_w or event.key == pygame.K_UP:
-                facing = "up"
+                if facing[0] != "up" and len(facing) == 1:
+                    facing.append("up")
             elif event.key == pygame.K_s or event.key == pygame.K_DOWN:
-                facing = "down"
+                if facing[0] != "down" and len(facing) == 1:
+                    facing.append("down")
             
 
             
     count += 1
     
-    if count % 12 == 0:
-        if facing == "left":
-            snake[0][0] -= 1
-        elif facing == "right":
-            snake[0][0] += 1
-        elif facing == "up":
-            snake[0][1] -= 1
-        elif facing == "down":
-            snake[0][1] += 1
-
+    if count % 10 == 0:
+        print(facing)
+        if len(facing) == 2:
+            move(facing[0])
+            facing.pop(0)
+        else:
+            move(facing[0])
+            
     # Add board to the screen
     screen.blit(board, (0, 0))
     
