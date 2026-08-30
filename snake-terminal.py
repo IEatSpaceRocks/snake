@@ -1,8 +1,7 @@
-# IEatSpaceRocks, 29/08/2026
+# IEatSpaceRocks, 30/08/2026
 
 # Libraries
-import sys
-import random
+import sys, random
 
 # Generate board
 board = [["g"] * 17 for _ in range(15)]
@@ -39,6 +38,7 @@ def clearTerm():
 def printBlock(colour):
     print(getattr(ANSI, colour) + "    " + ANSI.RESET, end="")
 
+# Check if apple is eaten. If yes, generate a new one and add one to the score
 def checkApple(aX, aY, sX, sY, score):
     if aX == sX and aY == sY:
         while aX == sX:
@@ -49,7 +49,10 @@ def checkApple(aX, aY, sX, sY, score):
         score += 1
     return aX, aY, score
 
+# Update the snakes length and position. Check if the snake collided into itself
 def updateSnake(sX, sY, score):
+    if [sY, sX] in snake:
+        return False
     snake.append([sY, sX])
     board[sY][sX] = "S"
     while len(snake) != score:
@@ -58,6 +61,7 @@ def updateSnake(sX, sY, score):
         else:
             board[snake[0][0]][snake[0][1]] = "g"
         snake.pop(0)
+    return True
 
 
 
@@ -74,7 +78,7 @@ def printBoard():
                         printBlock("GREEN2")
                 elif board[y][x] == "S":            # If a snake tile:
                     printBlock("BLUE")
-                elif board[y][x] == "A":
+                elif board[y][x] == "A":            # If an apple tile:
                     printBlock("RED")
                 count += 1                          # Add one to count, to change the grass colour
             count += 1                              # Add one to count after each row, to make it print the same colour blocks again (So we get a 2 high patch)
@@ -82,19 +86,19 @@ def printBoard():
         count += 1                                  # Add one to count, so after every 2 rows of same colours, we get an offset 2 rows
                 
     
-    
+# Initalize apple and snake
+appleX, appleY, score = checkApple(appleX, appleY, snakeX, snakeY, score)
+running = updateSnake(snakeX, snakeY, score)
+
 # MAIN LOOP
     
 while running:
-    
-    clearTerm()
 
-    appleX, appleY, score = checkApple(appleX, appleY, snakeX, snakeY, score)
-    updateSnake(snakeX, snakeY, score)
+    # Clear terminal
+    clearTerm()
         
     # Print board (Every second grass patch will be a different shade)
     printBoard()
-    print(score, snake)
     
     # Input for movement direction
     move = ""
@@ -111,13 +115,12 @@ while running:
         snakeY += 1
     else:
         snakeX += 1
+
+    # Update apple and snake
+    appleX, appleY, score = checkApple(appleX, appleY, snakeX, snakeY, score)
+    running = updateSnake(snakeX, snakeY, score)
         
     # Check if player is out of bounds (Dead)
     if snakeY < 0 or snakeX < 0 or snakeY > 14 or snakeX > 16:
         print("You died")
         running = False
-    for part in snake:
-        if snake.count(part) == 2:
-            print("Dead")
-            running = False
-            break
