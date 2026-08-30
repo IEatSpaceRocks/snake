@@ -12,7 +12,7 @@ appleY, appleX = 7, 8
 snake = []
 score = 0
 running = True
-
+lastMove = ""
 
 # Set up ANSI text formatting, define all colours used
 class ANSI:
@@ -24,7 +24,8 @@ class ANSI:
     
     GREEN1 = getCol((167, 217, 72))
     GREEN2 = getCol((142, 204, 57))
-    BLUE = getCol((66, 111, 227))
+    BLUE1 = getCol((66, 111, 227))
+    BLUE2 = getCol((58, 98, 205))
     RED = getCol((231, 71, 29))
 
 
@@ -41,9 +42,8 @@ def printBlock(colour):
 # Check if apple is eaten. If yes, generate a new one and add one to the score
 def checkApple(aX, aY, sX, sY, score):
     if aX == sX and aY == sY:
-        while aX == sX:
+        while [aY, aX] in snake or (aX == sX and aY == sY):
             aX = random.randint(0, 16)
-        while aY == sY:
             aY = random.randint(0, 14)
         board[aY][aX] = "A"
         score += 1
@@ -51,8 +51,6 @@ def checkApple(aX, aY, sX, sY, score):
 
 # Update the snakes length and position. Check if the snake collided into itself
 def updateSnake(sX, sY, score):
-    if [sY, sX] in snake:
-        return False
     snake.append([sY, sX])
     board[sY][sX] = "S"
     while len(snake) != score:
@@ -61,7 +59,10 @@ def updateSnake(sX, sY, score):
         else:
             board[snake[0][0]][snake[0][1]] = "g"
         snake.pop(0)
-    return True
+    if snake.count([sY, sX]) > 1:
+        return False
+    else:
+        return True
 
 
 
@@ -76,8 +77,10 @@ def printBoard():
                         printBlock("GREEN1")
                     else:                           # If count is uneven -> darker green
                         printBlock("GREEN2")
+                elif x == snakeX and y == snakeY:   # If snake head:
+                    printBlock("BLUE2")
                 elif board[y][x] == "S":            # If a snake tile:
-                    printBlock("BLUE")
+                    printBlock("BLUE1")
                 elif board[y][x] == "A":            # If an apple tile:
                     printBlock("RED")
                 count += 1                          # Add one to count, to change the grass colour
