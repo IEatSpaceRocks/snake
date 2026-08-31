@@ -19,6 +19,7 @@ apple = [9, 8]
 snake = [[9, 8]]
 count = 0
 facing = ["up"]
+last = ""
 score = 0
 
 # Initialize Pygame and set up the screen
@@ -105,10 +106,15 @@ while running:
     if count % 12 == 0:
         print(facing)
         if len(facing) == 2:
-            move(facing[0])
+            if last == facing[0]:
+                move(facing[1])
+            else:
+                move(facing[0])
             facing.pop(0)
         else:
             move(facing[0])
+            
+    last = facing[0]
             
     checkApple(score)
             
