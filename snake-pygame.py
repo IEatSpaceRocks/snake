@@ -1,7 +1,7 @@
 # IEatSpaceRocks, 30/08/2026
 
 # Libraries
-import pygame
+import pygame, random
 
 # Define colours
 colours = {
@@ -15,10 +15,11 @@ colours = {
 
 # Variables
 running = True
-apple = [1, 1]
+apple = [9, 8]
 snake = [[9, 8]]
 count = 0
 facing = ["up"]
+score = 0
 
 # Initialize Pygame and set up the screen
 pygame.init()
@@ -37,6 +38,19 @@ for col in range(1, 18):
     for row in range(1, 16):
         colour = "GREEN2" if (row + col) % 2 == 0 else "GREEN1"
         pygame.draw.rect(board, colours.get(colour), (col * 40, 120 + row * 40, 40, 40))
+        
+def checkApple(score):
+    if apple in snake:
+        score += 1
+    while apple in snake:
+        apple[0] = random.randint(1, 17)
+        apple[1] = random.randint(1, 15)
+
+def checkRunning():
+    for part in snake:
+        if part[0] < 1 or part[1] < 1 or part[0] > 17 or part[1] > 15:
+            return False
+    return True
         
 def draw():
     pygame.draw.circle(screen, colours.get("RED"), (40 + apple[0] * 40 - 20, 160 + apple[1] * 40 - 20), 19)
@@ -66,29 +80,37 @@ while running:
             if event.key == pygame.K_ESCAPE:
                 running = False
             elif event.key == pygame.K_a or event.key == pygame.K_LEFT:
-                if facing[0] != "left" and len(facing) == 1:
+                if "left" not in facing:
+                    if len(facing) == 2:
+                        facing.pop(0)
                     facing.append("left")
             elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
-                if facing[0] != "right" and len(facing) == 1:
+                if "right" not in facing:
+                    if len(facing) == 2:
+                        facing.pop(0)
                     facing.append("right")
             elif event.key == pygame.K_w or event.key == pygame.K_UP:
-                if facing[0] != "up" and len(facing) == 1:
+                if "up" not in facing:
+                    if len(facing) == 2:
+                        facing.pop(0)
                     facing.append("up")
             elif event.key == pygame.K_s or event.key == pygame.K_DOWN:
-                if facing[0] != "down" and len(facing) == 1:
+                if "down" not in facing:
+                    if len(facing) == 2:
+                        facing.pop(0)
                     facing.append("down")
-            
-
-            
+                    
     count += 1
     
-    if count % 10 == 0:
+    if count % 12 == 0:
         print(facing)
         if len(facing) == 2:
             move(facing[0])
             facing.pop(0)
         else:
             move(facing[0])
+            
+    checkApple(score)
             
     # Add board to the screen
     screen.blit(board, (0, 0))
